@@ -73,7 +73,10 @@ func envInt(key string, def int) int {
 	return def
 }
 
-const usage = "usage: GIT_SYNC_REPO= GIT_SYNC_DEST= [GIT_SYNC_BRANCH= GIT_SYNC_WAIT= GIT_SYNC_DEPTH= GIT_SYNC_USERNAME= GIT_SYNC_PASSWORD= GIT_SYNC_ONE_TIME=] git-sync -repo GIT_REPO_URL -dest PATH [-branch -wait -username -password -depth -one-time]"
+const (
+	usage = "usage: GIT_SYNC_REPO= GIT_SYNC_DEST= [GIT_SYNC_BRANCH= GIT_SYNC_WAIT= GIT_SYNC_DEPTH= GIT_SYNC_USERNAME= GIT_SYNC_PASSWORD= GIT_SYNC_ONE_TIME=] git-sync -repo GIT_REPO_URL -dest PATH [-branch -wait -username -password -depth -one-time]"
+	chmod      = "find %s -not -iwholename '*.git*' -type d -exec chmod +x {} +"
+)
 
 func main() {
 	flag.Parse()
@@ -151,6 +154,14 @@ func syncRepo(repo, dest, branch, rev string, depth int) error {
 		return fmt.Errorf("error running command %q : %v: %s", strings.Join(cmd.Args, " "), err, string(output))
 	}
 	log.Printf("reset %q: %v", rev, string(output))
+
+	// set directory permissions
+	cmd = exec.Command(fmt.Sprintf(chmod, dest))
+	cmd.Dir = dest
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error running command %q : %v: %s", strings.Join(cmd.Args, " "), err, string(output))
+	}
 
 	return nil
 }
