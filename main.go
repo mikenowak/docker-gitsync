@@ -73,10 +73,7 @@ func envInt(key string, def int) int {
 	return def
 }
 
-const (
-	usage = "usage: GIT_SYNC_REPO= GIT_SYNC_DEST= [GIT_SYNC_BRANCH= GIT_SYNC_WAIT= GIT_SYNC_DEPTH= GIT_SYNC_USERNAME= GIT_SYNC_PASSWORD= GIT_SYNC_ONE_TIME=] git-sync -repo GIT_REPO_URL -dest PATH [-branch -wait -username -password -depth -one-time]"
-	chmod      = "find %s -not -iwholename '*.git*' -type d -exec chmod +x {} +"
-)
+const usage = "usage: GIT_SYNC_REPO= GIT_SYNC_DEST= [GIT_SYNC_BRANCH= GIT_SYNC_WAIT= GIT_SYNC_DEPTH= GIT_SYNC_USERNAME= GIT_SYNC_PASSWORD= GIT_SYNC_ONE_TIME=] git-sync -repo GIT_REPO_URL -dest PATH [-branch -wait -username -password -depth -one-time]"
 
 func main() {
 	flag.Parse()
@@ -156,7 +153,7 @@ func syncRepo(repo, dest, branch, rev string, depth int) error {
 	log.Printf("reset %q: %v", rev, string(output))
 
 	// set directory permissions
-	cmd = exec.Command(fmt.Sprintf(chmod, dest))
+        cmd = exec.Command("find", dest, "-not", "-iwholename", "'*.git*'", "-type", "d", "-exec", "chmod", "+x", "{}", "+")
 	cmd.Dir = dest
 	output, err = cmd.CombinedOutput()
 	if err != nil {
